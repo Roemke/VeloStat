@@ -1,0 +1,41 @@
+array (
+  'spannungStart' => '0',
+  'spannungStop' => '0',
+  'energie' => '0',
+  'distanz' => '0.28727433871597813',
+  'length' => '3',
+  'trackKomplett' => 'true',
+  'trackData' => 
+  array (
+    0 => 
+    array (
+      'timestamp' => '1415638333558',
+      'coords' => 
+      array (
+        'latitude' => '50.929283073843216',
+        'longitude' => '6.956104498455752',
+      ),
+    ),
+    1 => 
+    array (
+      'timestamp' => '1415638335558',
+      'coords' => 
+      array (
+        'latitude' => '50.927861471153555',
+        'longitude' => '6.958285346684497',
+      ),
+    ),
+    2 => 
+    array (
+      'timestamp' => '1415638337559',
+      'coords' => 
+      array (
+        'latitude' => '50.92766712330002',
+        'longitude' => '6.957374597027883',
+      ),
+    ),
+  ),
+  'geschwindigkeit' => '258.482284273312',
+  'onMap' => 'false',
+  'trackPath' => '',
+)

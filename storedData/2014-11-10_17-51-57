@@ -1,0 +1,77 @@
+array (
+  'spannungStart' => '0',
+  'spannungStop' => '0',
+  'energie' => '0',
+  'distanz' => '1.333813185528092',
+  'length' => '7',
+  'trackKomplett' => 'true',
+  'trackData' => 
+  array (
+    0 => 
+    array (
+      'timestamp' => '1415638317551',
+      'coords' => 
+      array (
+        'latitude' => '50.93032239638687',
+        'longitude' => '6.955606955031617',
+      ),
+    ),
+    1 => 
+    array (
+      'timestamp' => '1415638319552',
+      'coords' => 
+      array (
+        'latitude' => '50.93070542536279',
+        'longitude' => '6.955336213811751',
+      ),
+    ),
+    2 => 
+    array (
+      'timestamp' => '1415638321553',
+      'coords' => 
+      array (
+        'latitude' => '50.92878006799797',
+        'longitude' => '6.957569995946469',
+      ),
+    ),
+    3 => 
+    array (
+      'timestamp' => '1415638323553',
+      'coords' => 
+      array (
+        'latitude' => '50.930964004486555',
+        'longitude' => '6.955553774973596',
+      ),
+    ),
+    4 => 
+    array (
+      'timestamp' => '1415638325554',
+      'coords' => 
+      array (
+        'latitude' => '50.92848618341562',
+        'longitude' => '6.957483258714419',
+      ),
+    ),
+    5 => 
+    array (
+      'timestamp' => '1415638327555',
+      'coords' => 
+      array (
+        'latitude' => '50.93076844313949',
+        'longitude' => '6.957401864440398',
+      ),
+    ),
+    6 => 
+    array (
+      'timestamp' => '1415638329555',
+      'coords' => 
+      array (
+        'latitude' => '50.92957660575699',
+        'longitude' => '6.959145141825065',
+      ),
+    ),
+  ),
+  'geschwindigkeit' => '400.01061878549905',
+  'onMap' => 'false',
+  'trackPath' => '',
+)

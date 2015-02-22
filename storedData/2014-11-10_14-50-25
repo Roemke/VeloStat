@@ -1,0 +1,30 @@
+array (
+  0 => 
+  array (
+    'spannungStart' => '0',
+    'spannungStop' => '0',
+    'energie' => '0',
+    'distanz' => '0',
+    'length' => '1',
+    'trackKomplett' => 'false',
+    'trackData' => 
+    array (
+      0 => 
+      array (
+        'timestamp' => '1415631025591',
+        'coords' => 
+        array (
+          'latitude' => '50.9320995',
+          'longitude' => '6.953899799999999',
+          'altitude' => '',
+          'accuracy' => '67735',
+          'heading' => '',
+          'speed' => '',
+        ),
+      ),
+    ),
+    'geschwindigkeit' => '',
+    'onMap' => 'false',
+    'trackPath' => '',
+  ),
+)

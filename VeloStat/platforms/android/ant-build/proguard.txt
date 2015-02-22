@@ -1,0 +1,3 @@
+# view AndroidManifest.xml #generated:6
+-keep class de.zb42.velostat.CordovaApp { <init>(...); }
+

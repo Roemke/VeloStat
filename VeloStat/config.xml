@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="de.zb42.velostat" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>VeloStat</name>
+    <description>
+        VeloStat tracks your way with the Velomobil. 
+    </description>
+    <author email="k.roemke@googlemail.com" href="http://zb42.de">
+        Karsten Römke
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <icon src="www/img/velo128.png" />        
+</widget>

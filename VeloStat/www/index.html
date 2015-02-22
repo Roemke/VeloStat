@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html  >
+    <!-- manifest="VeloStat.appcache" <- gehört hinter <html in cordova wohl nicht
+    see README.md
+    -->
+    <head>
+        <title>VeloStat</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="apple-mobile-web-app-capable" content="yes" >
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" >
+        <link rel="apple-touch-icon" href="img/velo128.png"/>
+        <link rel="apple-touch-icon-precomposed" href="img/velo128.png"/>
+        <meta name="mobile-web-app-capable" content="yes">
+        <link rel="shortcut icon" sizes="196x196" href="img/velo196.png">
+        <link rel="shortcut icon" sizes="128x128" href="img/velo128.png">
+        <link rel="shortcut icon" href="img/velo128.png">
+        <link rel="stylesheet" type="text/css" href="css/VeloStat.css">
+        <link rel="stylesheet" type="text/css" href="js/jquerymobile/jquery.mobile-1.4.4.min.css">
+
+        <script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
+        <!-- maps api -->
+        <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+        <!-- include veloStatApp ->  bind to mobile init before loading jquery mobile ! -->
+        <script src="js/storage.js" type="text/javascript"></script>
+        <script src="js/veloStatApp.js" type="text/javascript"></script>
+        <!-- erst jetzt kann mobile kommen -->
+        <script src="js/jquerymobile/jquery.mobile-1.4.4.min.js" type="text/javascript"></script>
+
+        <script src="js/events.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <div data-role='page' id='controlPage'>
+            <div data-role="header" >
+                <h1 id='controlPageHeader'>Control</h1>
+           </div>
+            <div data-role="content">
+            	<!-- auch navbar widget macht es nicht optimal -> nehme code der nachtraeglich anpasst -->
+                <div id='tiled' align="center">
+                <div  id='controlDiv'  data-role="controlgroup" data-type="horizontal">
+                            <a id="bStart" data-role="button" data-mini="true" href="#" ><span>Start</span></a>
+                            <a id="bPause" data-role="button" data-mini="true" href="#" class="ui-disabled"><span>Pause</span></a>
+                            <a id="bStop"  data-role="button" data-mini="true" href="#" class="ui-disabled"><span>Stop / Del</span></a>
+                            <a id="bStopSave" data-role="button" data-mini="true" href="#" class="ui-disabled"><span>Stop / Save</span></a>
+                </div>
+                </div>
+                 <!--
+                     <div id='controlDiv' data-role="nav-bar" data-role="controlgroup" data-type="horizontal" >
+                        <button id="bStart" class="ui-btn">Start</button>
+                        <button id="bPause" class="ui-btn" class="ui-disabled">Pause</button>
+                        <button id="bStop"  class="ui-btn" class="ui-disabled">Stop/Del</button>
+                        <button id="bStopSave" class="ui-btn" class="ui-disabled" >Stop/Save</button>
+                    </div>
+                   -->
+                <div id="daten">
+                    <table>
+                        <tr>
+                            <td>Spannung Start: </td>
+                            <td><span id="spannungStart">???</span></td>
+                        </tr>
+                        <tr>
+                            <td>Start (lat, lon): </td>
+                            <td><span id="latStart">???</span></td>
+                            <td>,</td><td><span id="lonStart">???</span></td>
+                        </tr>
+                        <tr>
+                            <td>Aktuell (lat, lon):</td><td><span id="latAktuell">???</span></td>
+                            <td>,</td><td><span id="lonAktuell">???</span></td>
+                        </tr>
+                        <tr>
+                            <td>Genauigkeit:</td><td><span id="genauigkeit">0</span> m</td>
+                        </tr>
+                        <tr>
+                            <td>Geschwindigkeit:</td><td><span id="geschwindigkeit">0</span> m/s</td>
+                        </tr>
+                        <tr>
+                            <td>Entfernung:</td><td><span id="entfernung">0</span> km</td>
+                        </tr>
+                        <tr>
+                            <td>Energiesumme:</td><td><span id="energieSumme">0</span> Wh</td>
+                        </tr>
+    
+                    </table>
+                </div>
+            </div>
+            <div data-role="footer"  data-position="fixed" >
+                <div data-role="navbar">
+                    <ul>
+                        <li>
+                            <a href="#mapPage"  data-transition="flip">Karte</a>
+                        </li>
+                        <li>
+                            <a href="#dataPage"  data-transition="flip">Daten</a>
+                        </li>
+                        <li>
+                            <a href="#etcPage"  data-transition="flip">Etc</a>
+                        </li>
+                        <li>
+                            <a href="#hilfePage"  data-transition="flip">Hilfe</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- dialog fuer die Eingabe der Spannung , dialog deprecated in 1.4 -->
+            <!-- im Gegensatz zum dialog muss das popup Element allerdings innerhalb der Seite
+            liegen, eine Seite sagte: innerhalb content? -->
+            <div data-role="popup" id="popUpSpannung" data-dismissible="false">
+                <div data-role="header">
+                    <h3>Eingabe</h3>
+                </div>
+                <div id="content" data-role="content">
+                    <div data-role="fieldcontain" data-inline="true">
+                        <label id="labelInSpannung" for="spannung">Spannung</label>
+                        <input id='inSpannung' type="number" name = "spannung">
+                    </div>
+                    <fieldset data-role="fieldcontain" data-inline="true" id="fsEnergie">
+                        <label id="labelInEnergie" for="inEnergie">Energieverbrauch</label>
+                        <input id='inEnergie' type="number" name = "inEnergie">
+                    </fieldset>
+                    <fieldset data-role="controlgroup" id="fsStoreComplete">
+                        <input type="checkbox" name="cbStoreComplete" id="cbStoreComplete" class="custom" />
+                        <label for="cbStoreComplete">Tracks komplett speichern</label>
+                    </fieldset>
+                    <a href="" data-rel="back" data-theme="b" data-role="button">ok</a>
+                </div>
+            </div>
+            <!-- ja/nein Dialog, hmm, muss tatsaechlich auf einer Seite liegen, das ist doch Quark -->
+            <div data-role="popup" id="popUpWirklichStop" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+                <div data-role="header" data-theme="a">
+                    <h1>Best&aumltigen!</h1>
+                </div>
+                <div role="main" class="ui-content">
+                    <h3 class="ui-title">Stop ohne Speichern - sicher?</h3>
+                    <p>
+                        Diese Aktion kann nicht r&uuml;ckg&auml;ngig gemacht werden.
+                    </p>
+                    <a href="#"  class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">Neeein!</a>
+                    <a href="#" id='popUpWirklichStopYes' class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" data-transition="flow">Ja &ndash; weg damit</a>
+                </div>
+            </div>
+
+        </div>
+        <!-- Ende erste Seite -->
+        <!-- naechste Seite, Map -->
+        <div data-role='page' id='mapPage'>
+            <!-- fuer Googlemaps -->
+            <div data-role="header" >
+                <h1 id='mapHeader'>Map</h1>
+            </div>
+            <div data-role="content" id="mapArea"></div>
+            <div data-role="footer"  data-position="fixed" >
+                <div data-role="navbar">
+                    <ul>
+                        <li>
+                            <a href="#controlPage"  data-transition="flip">Control</a>
+                        </li>
+                        <li>
+                            <a href="#dataPage"  data-transition="flip">Daten</a>
+                        </li>
+                        <li>
+                            <a href="#etcPage"  data-transition="flip">Etc</a>
+                        </li>
+                        <li>
+                            <a href="#hilfePage"  data-transition="flip">Hilfe</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- Ende  Map -->
+        <!-- naechste Seite, Daten uebersicht -->
+        <div data-role='page' id='dataPage'>
+            <div data-role="header" >
+                <h1>gespeichert (verwendet: <span id="usedStorage"></span>)</h1> 
+            </div>
+            <div data-role="content" id="divDataList">
+                <ul id='ulDataList' data-role="listview" data-inset="true"  > 
+                    <!-- dummy   <li><a href="#dataPageEinzeln">mal sehen</a></li> -->
+                </ul>
+            </div>
+            <div data-role="footer"  data-position="fixed" >
+            	<div id='divModifyButtons' class="btRules"  data-role="navbar">
+            		<ul>
+            			<li><button value="x" >L&ouml;sche X</button></li>
+            			<li><button value="-" >Reduziere X</button></li>
+            		    <li><button value="t" >X &ndash;&gt; Server</button></li>
+            		    <li><button value="r" > &lt;&ndash; Server</button></li>
+            		</ul>
+            	</div>
+                <div data-role="navbar">
+                    <ul>
+                        <li>
+                            <a href="#controlPage"  data-transition="flip">Control</a>
+                        </li>
+                        <li>
+                            <a href="#mapPage"  data-transition="flip">Karte</a>
+                        </li>
+                        <li>
+                            <a href="#etcPage"  data-transition="flip">Etc</a>
+                        </li>
+                        <li>
+                            <a href="#hilfePage"  data-transition="flip">Hilfe</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- wieder das redundante dialog spiel -->
+            <div data-role="popup" id="popUpSicher" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+                <div data-role="header" data-theme="a">
+                    <h1>Best&aumltigen!</h1>
+                </div>
+                <div role="main" class="ui-content">
+                    <h3 class="ui-title">Sicher?</h3>
+                    <p>
+                        Diese Aktion kann nicht r&uuml;ckg&auml;ngig gemacht werden.
+                    </p>
+                    <a href="#"  class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">Neeein!</a>
+                    <a href="#" id='popUpSicherYes' class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" data-transition="flow">Ja doch!</a>
+                </div>
+            </div>
+
+        </div>
+        <!-- Ende  Daten uebersicht -->
+        <!-- naechste Seite, DetailDaten , nur von der Datenseite aus erreichbar-->
+        <div data-role='page' id='dataPageEinzeln'>
+            <!-- fuer Googlemaps -->
+            <div data-role="header"  data-add-back-btn="true" data-back-btn-text="Liste" >
+                <h1>Details</h1>
+            </div>
+            <div data-role="content" id="divDataEinzeln">
+                <table>
+                    <tr>
+                        <td>Start: </td>
+                        <td><span id="ddDTStart">???</span></td>
+                    </tr>
+                    <tr>
+                        <td>End: </td>
+                        <td><span id="ddDTEnd">???</span></td>
+                    </tr>
+                    <tr>
+                        <td>Track komplett: </td>
+                        <td><span id="ddTrackKomplett">???</span></td>
+                    </tr>
+                    <tr>
+                        <td> gespeicherte Positionen: </td>
+                        <td><span id="ddPositionen">???</span></td>
+                    </tr>
+                    <tr>
+                        <td>Spannung Start: </td>
+                        <td><span id="ddSpStart">???</span>V</td>
+                    </tr>
+                    <tr>
+                        <td>Spannung Ende: </td>
+                        <td><span id="ddSpEnd">???</span>V</td>
+                    </tr>
+                    <tr>
+                        <td>Energieverbrauch: </td>
+                        <td><span id="ddEnergie">???</span>Wh</td>
+                    </tr>
+                    <tr>
+                        <td>Distanz: </td>
+                        <td><span id="ddDistanz">???</span>km</td>
+                    </tr>
+                    <tr>
+                        <td>mittlere Geschwindigkeit: </td>
+                        <td><span id="ddGeschwindigkeit">???</span>km/h</td>
+                    </tr>
+                </table>
+                <table id="tabTrackData">
+                </table>
+            </div>
+            
+        </div>
+        <!-- naechste Seite, Liste vom Server, nur von der Datenseite aus erreichbar -->
+        <div data-role='page' id='serverData'>
+            <div data-role="header"  data-add-back-btn="true" data-back-btn-text="Daten" >
+                <h1>Server-Daten</h1>
+            </div>
+            <div data-role="content" id="divServerData">
+            </div>
+						<button id='bGetServerData'>&Uuml;bernehme Daten vom Server</button>            
+        </div>
+
+        <!-- naechste Seite, Etc, Einstellungen -->
+        <div data-role='page' id='etcPage'>
+            <div data-role="header" >
+                <h1 id='mapHeader'>Einstellungen</h1>
+            </div>
+            <div data-role="content" id="einstellungen">
+                <fieldset data-role="controlgroup" data-iconpos="right">
+                   <input name = "cbSimulation" id="cbSimulation" type="checkbox">
+                   <label for ="cbSimulation" >Simulation einer Bewegung</label>
+                   <input name = "cbPanPosition" id="cbPanPosition" type="checkbox">
+                   <label for ="cbPanPosition" >Folge Position</label>
+                   <input name = "cbPanTrack" id="cbPanTrack" type="checkbox">
+                   <label for ="cbPanTrack" >Folge User-Track </label>
+                   <input name = "cbStoreTracksComplete" id="cbStoreTracksComplete" type="checkbox">
+                   <label for ="cbStoreTracksComplete" >Tracks komplett speichern</label>
+              <form>   
+                  <div class="ui-field-contain">  
+                    <label for="energieWarnung">Energiewarnung:</label>
+                    <input name="energieWarnung" id="energieWarnung" min="0" max="500"
+                    step="5" value="200" type="range">
+                </div>
+                  <div class="ui-field-contain">  
+                    <label for="recordingDistance">Delta Dist:</label>
+                    <input name="recordingDistance" id="recordingDistance" min="0.5" max="100"
+                    step="0.5" value="1" type="range">
+                </div>
+                </form>
+              </fieldset>
+              <fieldset data-role="controlgroup">
+                 <button id="bEnergieSummeLoeschen" type="button" >
+                    L&ouml;sche Summe Energie
+                </button>
+                 <button id="bDatenLoeschen" type="button" >
+                    alle Track-Daten l&ouml;schen
+                 </button>
+                <button id="bDatenTransfer" type="button">
+                    Transfer Daten zum Server
+                </button>
+               </fieldset>
+            </div>
+            <div data-role="footer"  data-position="fixed" >
+                <div data-role="navbar">
+                    <ul>
+                        <li>
+                            <a href="#controlPage"  data-transition="flip">Control</a>
+                        </li>
+                        <li>
+                            <a href="#mapPage"  data-transition="flip">Karte</a>
+                        </li>
+                        <li>
+                            <a href="#dataPage"  data-transition="flip">Daten</a>
+                        </li>
+                        <li>
+                            <a href="#hilfePage"  data-transition="flip">Hilfe</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- ja/nein Dialog, hmm, muss tatsaechlich auf einer Seite liegen, das ist doch Quark,
+            so benoetigt man mehrere Dialoge fuer den gleichen Kram -->
+            <div data-role="popup" id="popUpEtc" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+                <div data-role="header" data-theme="a">
+                    <h1>Best&aumltigen!</h1>
+                </div>
+                <div role="main" class="ui-content">
+                    <h3 class="ui-title" id="etcAbfrage">Locale Daten l&ouml;schen?</h3>
+                    <p>
+                        Diese Aktion kann nicht r&uuml;ckg&auml;ngig gemacht werden.
+                    </p>
+                    <a href="#"  class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">Neeein!</a>
+                    <a href="#" id='popUpEtcWirklichStopYes' class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" data-transition="flow">Ja &ndash; weg damit</a>
+                </div>
+            </div>
+
+        </div>
+
+        <div data-role='page' id='hilfePage'  >
+            <div data-role="header" >
+                <!-- eigenen Button, da der Backbutton aus Datarole nur kommt, wenn jemand von einer anderen Seite hierher
+                navigiert ist, nicht bei eingabe der URL (das ist meist ja sinnlos, passierte mir trotzdem) -->
+                <h1>Bedienung</h1>
+            </div>
+            <div data-role="content">
+                <p>
+                    Das Programm dient dazu den Energieverbrauch bei einer Tour mit dem Velomobil festzuhalten, die Hilfe ist
+                    leider nicht fertig, das Wesentliche ist da,  werde  daran arbeiten ...<br>
+                    Steigt der aufsummierte Wert über eine Schwelle, dann wird eine Warnung ausgegeben. <br>
+                    Man kann auch den gesamten Track mit aufzeichnen, s.u. allerdings wird die Aufzeichnung unterbrochen, wenn
+                    das Smartphone ausgeschaltet wird, wahrscheinlich auch, wenn der Browser im Hintergrund ist. 
+                    Keine Möglichkeit gefunden, dies zu umgehen, evtl. mit phonegap bei Zeit könnte man mal nachsehen. 
+                    Dies ist die PhoneGap / cordova Version und die Aufzeichnung l&auml;uft im Hintergrund weiter. Es war nicht
+                    mal irgendein Plugin erforderlich. Ich glaube der Netzwerkzugriff funktioniert im Hintergrund nicht, den 
+                    brauche ich aber auch nicht. 
+                </p>
+                <p> <strong>Beachte: Getestet ist nur unter Chrome, PhoneGAP: Nur die Android Variante.</strong></p>
+                <p>
+                    Beim Starten der Aufzeichnung sollte man die Spannung eingeben.
+                    <br>
+                    Stoppt man die Aufzeichnung, dann wird wieder die Spannung und zus&auml;tzlich
+                    der Energieverbrauch abgefragt.
+                    <br>
+                    Die checkbox store all gibt an, ob alle Trackdaten gespeichert werden oder nur Start und Endpunkt.
+                    (Voreinstellung in etc: Tracks komplett speichern)
+                </p>
+                <p>
+                    Map blendet die GoogleMap mit dem Standort und dem zur&uuml;ck gelegten Weg ein. 
+                </p>
+                <p>
+                    Mittels etc werden diverse Einstellungen vorgenommen, <br>
+                    Simulation - zur Entwicklung, Simulation einer
+                    Bewegung. 
+                    <br>Folge Position - verlässt das Smartphone den Kartenausschnitt, dann wird die Karte verschoben. 
+                    <br>Folge User-Track - der aktuellste der anzuzeigenden Tracks (siehe Daten) wird komplett auf der Karte angezeigt.
+                	<br>Energie-Warnung - Schwelle f&uuml;r die Warnung beim Energieverbrauch
+                	<br>Delta Dist - ab welcher &Auml;nderung der Position wird aufgezeichnet, das GPS-Signal bei meinem Smartphone 
+                	 schwankt ziemlich.
+                </p>
+                <p>
+                	Daten erlaubt es die Daten der einzelnen Tracks anzusehen. In der &Uuml;bersicht wird die Startzeit angezeigt. 
+                	Complete gibt an, ob der Track ganz gespeichert wurde, mittels der Checkbox map l&auml;sst sich der Track auf der
+                	Karte anzeigen.                  	                    
+                </p>
+                <p>
+                    Ideen: die Daten herunter laden, Statistik &uuml;ber alle Tracks 
+                </p>
+            </div>
+            <!-- ende content -->
+            <div data-role="footer"  data-position="fixed">
+                <div data-role="navbar">
+                    <ul>
+                        <li>
+                            <a href="#controlPage"  data-transition="flip">Control</a>
+                        </li>
+                        <li>
+                            <a href="#installPage"  data-transition="flip">Installation</a>
+                        </li>
+                        <li>
+                            <a href="#ueberPage"  data-transition="flip">&Uuml;ber</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- ende page -->
+        <div data-role='page' id='installPage'  >
+            <div data-role="header" >
+                <!-- eigenen Button, da der Backbutton aus Datarole nur kommt, wenn jemand von einer anderen Seite hierher
+                navigiert ist, nicht bei eingabe der URL (das ist meist ja sinnlos, passierte mir trotzdem) -->
+                
+                <h1>Installation</h1>
+            </div>
+            <div data-role="content">
+                Die &quot;Installation&quot; bezieht sich auf den Offline-Betrieb. Die Seiten verwenden einen Speicher auf dem
+                eigenen Rechner / mobilen Ger&auml;t (Appcache) um auch ohne Internetverbindung verf&uuml;gbar zu sein.
+                <br>
+                Legt man ein Lesezeichen auf die Seite, so sollte der Zugriff auch funktionieren, wenn man Offline ist. <h3> Installation auf der Startseite eines mobilen Devices </h3>
+                Die Installation auf der Startseite bewirkt, dass man dort ein Icon f&uuml;r die Anwendung erh&auml;lt.
+                Getestet nur unter Android (Chrome, Firefox). <h3>Android</h3>
+                Das Vorgehen h&auml;ngt vom Browser ab. H&auml;ufig l&auml;ft es &uuml;ber ein Lesezeichen.
+                Dies wird hinzugef&uuml;gt, anschlie&szlig;end hat man die Option dieses dem Startbildschirm hinzu zuf&uuml;gen.
+                <p>Verwendet man Chrome unter Android, dann hat man direkt in den Einstellungen einen Menupunkt 
+                	&quot;zur Startseite&quot;.<br>
+                	Startet man diese App, dann hat man auch keinen Browserbalken (Adressleiste) mehr, sieht gut aus.
+               	</p>  
+                <h3>Apple (nicht getestet)</h3>
+                Im Safari-Browser dr&uuml;ckt man auf das Icon f&uuml;r weitere Funktionen und erh&auml;t dort die Option
+                &quot;zum Home-Bildschirm&quot;. <h3>Windows Phone (nicht getestet)</h3>
+                Im Browser-Menu ausw&auml;hlen: &quot;Auf Startseite&quot; und es sollte kacheln.
+            </div>
+            <!-- ende content -->
+            <div data-role="footer"  data-position="fixed">
+                <div data-role="navbar">
+                    <ul>
+                        <li>
+                            <a href="#controlPage"  data-transition="slide">Control</a>
+                        </li>
+                        <li>
+                            <a href="#hilfePage"  data-transition="slide">Hilfe</a>
+                        </li>
+                        <li>
+                            <a href="#ueberPage"  data-transition="slide">&Uuml;ber</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- ende page -->
+        <div data-role='page' id='ueberPage'  >
+            <div data-role="header" >
+                <!-- eigenen Button, da der Backbutton aus Datarole nur kommt, wenn jemand von einer anderen Seite hierher
+                navigiert ist, nicht bei eingabe der URL (das ist meist ja sinnlos, passierte mir trotzdem) -->
+                <h1> &Uuml;ber</h1>
+            </div>
+            <div data-role="content">
+                <p>
+                    Mal ein Versuch die GeoApi von Google zu nutzen.
+                    <br>
+                    &copy; Karsten R&ouml;mke, Beginn im September 2014 &ndash; man m&ouml;ge das Projekt verwenden wie man m&ouml;chte. Eine Garantie auf fehlerfreie Funktion wird
+                    nicht &uuml;bernommen.
+                </p>
+            </div>
+            <!-- ende content -->
+            <div data-role="footer"  data-position="fixed">
+                <div data-role="navbar">
+                    <ul>
+                        <li>
+                            <a href="#controlPage"  data-transition="slide">Control</a>
+                        </li>
+                        <li>
+                            <a href="#hilfePage"  data-transition="slide">Hilfe</a>
+                        </li>
+                        <li>
+                            <a href="#installPage"  data-transition="slide">Installation</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- ende page -->
+        </div>
+    </body>
+</html>

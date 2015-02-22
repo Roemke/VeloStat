@@ -1,0 +1,66 @@
+#controlDiv {
+    align: center;
+    height:23%;
+    text-align :center;
+    padding: 1px;
+    width:100%;
+    margin-right:auto;
+    margin-left:auto;
+    border-radius: 10px;
+    border-width: 1%;
+}
+/* h1 wird auf inline-Block gesetzt, hatte ursprünglich margin-left / right auf 30% 
+ * wohl um es zu zentrieren, wird aber auch so zentriert 
+ * important hier wichtig
+ * */
+h1 {
+	display: inline-block;
+	margin: 0% 0% !important;
+}
+/* damit die Karte angezeigt wird, klapt beim drehen noch nicht? */
+/* doch, geht ?*/
+             #mapArea {
+                padding: 0;
+                position : absolute !important;
+                top : 40px !important; 
+                right : 0;
+                bottom : 40px !important; 
+                left : 0 !important;    
+            }   
+
+.btRules {
+  border-top	:	1px solid black;
+  border-bottom	:	1px solid black;	
+}
+.warning 
+{
+        color: darkred;
+}
+.warning::after {
+    content: " - Warnung: Energieverbrauch";
+}
+.blue {
+	color: blue !important;
+}
+.krCBWrapper {
+	padding: 0px;
+	margin:  0px;
+}
+.krListLabel {
+	display: inline-block;
+	width: 35px;
+	height: 20px;
+	margin: 0px !important; 
+	border-width: 0px !important;
+	padding: 0px !important;
+	text-align: center;
+	vertical-align: bottom;  
+	
+}
+.krListDivsFloat{
+	display:inline-block;
+	float:right;
+}
+/* Leerzeichen heisst klasse 2 als subelement von klasse 1
+       , heisst beiden Klassen dies zuweisen (vergesse ich immer) */    
+    
